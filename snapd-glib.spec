@@ -8,7 +8,7 @@ Summary:	Library to allow GLib based applications access to snapd
 Summary(pl.UTF-8):	Biblioteka umożliwiająca dostęp do snapd aplikacjom opartym na GLibie 
 Name:		snapd-glib
 Version:	1.60
-Release:	1
+Release:	2
 License:	LGPL v2 or LGPL v3
 Group:		Libraries
 #Source0Download: https://github.com/snapcore/snapd-glib/releases
@@ -121,7 +121,7 @@ Group:		Development/Libraries
 Requires:	%{name}-devel = %{version}-%{release}
 Requires:	Qt5Core-devel >= 5
 Requires:	Qt5Network-devel >= 5
-Requires:	snapd-qt-devel = %{version}-%{release}
+Requires:	snapd-qt5-devel = %{version}-%{release}
 
 %description -n snapd-qt5-devel
 Header files for snapd-qt library.
