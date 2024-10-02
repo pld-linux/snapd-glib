@@ -14,14 +14,14 @@
 Summary:	Library to allow GLib based applications access to snapd
 Summary(pl.UTF-8):	Biblioteka umożliwiająca dostęp do snapd aplikacjom opartym na GLibie 
 Name:		snapd-glib
-Version:	1.65
+Version:	1.66
 Release:	1
 License:	LGPL v2 or LGPL v3
 Group:		Libraries
-#Source0Download: https://github.com/snapcore/snapd-glib/releases
-Source0:	https://github.com/snapcore/snapd-glib/releases/download/%{version}/%{name}-%{version}.tar.xz
-# Source0-md5:	4986061f3fd4bc71d1709a1ffcd1427e
-URL:		https://github.com/snapcore/snapd-glib
+#Source0Download: https://github.com/canonical/snapd-glib/releases
+Source0:	https://github.com/canonical/snapd-glib/releases/download/%{version}/%{name}-%{version}.tar.xz
+# Source0-md5:	c2f1c479004f7a8cc0c3a1503d79a147
+URL:		https://github.com/canonical/snapd-glib
 BuildRequires:	glib2-devel >= 1:2.46
 BuildRequires:	gobject-introspection-devel
 BuildRequires:	json-glib-devel >= 1.1.2
