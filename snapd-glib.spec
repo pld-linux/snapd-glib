@@ -11,17 +11,22 @@
 # mutually exclusive, library names are the same
 %undefine	with_qt5
 %endif
+%if %{with libsoup3}
+# docgen relies on snapd-2 library
+%undefine	apidocs
+%endif
 Summary:	Library to allow GLib based applications access to snapd
 Summary(pl.UTF-8):	Biblioteka umożliwiająca dostęp do snapd aplikacjom opartym na GLibie 
 Name:		snapd-glib
-Version:	1.66
+Version:	1.67
 Release:	1
 License:	LGPL v2 or LGPL v3
 Group:		Libraries
 #Source0Download: https://github.com/canonical/snapd-glib/releases
-Source0:	https://github.com/canonical/snapd-glib/releases/download/%{version}/%{name}-%{version}.tar.xz
-# Source0-md5:	c2f1c479004f7a8cc0c3a1503d79a147
+Source0:	https://github.com/canonical/snapd-glib/archive/%{version}/%{name}-%{version}.tar.gz
+# Source0-md5:	b8947d817e6f62e6dd5066d9951352dd
 URL:		https://github.com/canonical/snapd-glib
+%{?with_apidocs:BuildRequires:	gi-docgen}
 BuildRequires:	glib2-devel >= 1:2.46
 BuildRequires:	gobject-introspection-devel
 BuildRequires:	json-glib-devel >= 1.1.2
@@ -32,10 +37,8 @@ BuildRequires:	meson >= 0.58.0
 BuildRequires:	ninja >= 1.5
 BuildRequires:	pkgconfig
 BuildRequires:	rpm-build >= 4.6
-BuildRequires:	rpmbuild(macros) >= 1.736
-BuildRequires:	tar >= 1:1.22
+BuildRequires:	rpmbuild(macros) >= 2.042
 BuildRequires:	vala
-BuildRequires:	xz
 %if %{with qt5}
 BuildRequires:	Qt5Core-devel >= 5.9.5
 BuildRequires:	Qt5Network-devel >= 5.9.5
@@ -346,23 +349,25 @@ Statyczna biblioteka snapd-qt-2.
 %prep
 %setup -q
 
+%define _vpath_builddir "build-${soupkind}"
+
 %build
 for soupkind in %{?with_libsoup2:soup2} %{?with_libsoup3:soup3} ; do
-%meson build-${soupkind} \
+%meson \
 	%{!?with_static_libs:--default-library=shared} \
-	%{!?with_apidocs:-Ddocs=false} \
+	$([ "$soupkind" != "soup2" ] && echo %{!?with_apidocs:-Ddocs=false}) \
 	%{?with_qt5:-Dqt5=true} \
 	%{!?with_qt6:-Dqt6=false} \
-	$([ "$soupkind" = "soup2" ] && echo -Dsoup2=true)
+	$([ "$soupkind" = "soup2" ] && echo -Dsoup2=true -Ddocs=false)
 
-%ninja_build -C build-${soupkind}
+%meson_build
 done
 
 %install
 rm -rf $RPM_BUILD_ROOT
 
 for soupkind in %{?with_libsoup2:soup2} %{?with_libsoup3:soup3} ; do
-%ninja_install -C build-${soupkind}
+%meson_install
 done
 
 %if (%{with qt5} || %{with qt6}) && %{with static_libs}
@@ -372,6 +377,11 @@ done
 %if %{with libsoup3}
 %{__rm} $RPM_BUILD_ROOT%{_libdir}/qt5/qml/Snapd2/libSnapd2.a
 %endif
+%endif
+
+%if %{with apidocs}
+install -d $RPM_BUILD_ROOT%{_gidocdir}
+%{__mv} $RPM_BUILD_ROOT%{_docdir}/snapd-glib $RPM_BUILD_ROOT%{_gidocdir}
 %endif
 
 %{__rm} -r $RPM_BUILD_ROOT{%{_libexecdir},%{_datadir}}/installed-tests
@@ -454,7 +464,7 @@ rm -rf $RPM_BUILD_ROOT
 %if %{with apidocs}
 %files apidocs
 %defattr(644,root,root,755)
-%{_gtkdocdir}/snapd-glib
+%{_gidocdir}/snapd-glib
 %endif
 
 %if %{with qt5}
